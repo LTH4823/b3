@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @ToString
-public class Board {
+public class Board extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +27,11 @@ public class Board {
 
     private String writer;
 
-    @CreationTimestamp
-    private LocalDateTime regDate;
-
-    @LastModifiedDate
-    private LocalDateTime updateDate;
+//    @CreationTimestamp
+//    private LocalDateTime regDate;
+//
+//    @LastModifiedDate
+//    private LocalDateTime updateDate;
 
     public void changeTitle(String title){
         this.title = title;
