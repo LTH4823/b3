@@ -4,10 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.zerock.b3.entity.Board;
+import org.zerock.b3.repository.search.BoardSearch;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<Board, Integer> {
+public interface BoardRepository extends JpaRepository<Board, Integer>, BoardSearch {
 
     //JpaRepository<> 내부에 이미 CRUD 가 잡혀있다네
     // 그 외에도 많다네 ㅎ허ㅓㅓ허허허
