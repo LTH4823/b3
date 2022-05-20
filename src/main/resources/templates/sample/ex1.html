@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>ex1</h1>
+<!-- /*   <h2 th:text="${list}">l</h2> */ -->
+    <h3>[[${list}]]</h3>
+
+
+    <div th:with="max =${100}">
+        <h2>
+            <a th:href="@{/view(keyword=${list}, name ='작성자',limit = ${max})}">링크 테스트</a>
+        </h2>
+    </div>
+
+
+    <div th:with="num1 =${10}, num2 =${20}">
+        <h1>[[${num1 + num2}]]</h1>
+    </div>
+
+
+    <ul>
+        <li th:each="str, status: ${list}">[[${status.count}]]--------------[[${str}]]</li>
+    </ul>
+
+    <ul>
+        <th:block th:each="str,status: ${list}">
+<!--/*            <li th:text="${status.count + str}"></li> */ -->
+            <li th:text="|${status.count} ------- ${str}|"></li>
+            <li th:text="${status.count +'================'+str}"></li>
+<!--/*            이항 엘비스 연산자 */-->
+            <li th:text="${status.odd}? 'ODD----'+${str}"></li>
+        </th:block>
+    </ul>
+
+
+</body>
+</html>
