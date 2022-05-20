@@ -8,7 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.zerock.b3.dto.BoardDTO;
+import org.zerock.b3.dto.PageRequestDTO;
+import org.zerock.b3.dto.PageResponseDTO;
 import org.zerock.b3.entity.Board;
+import org.zerock.b3.service.BoardService;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +27,26 @@ public class BoardRepositoryTests {
     private BoardRepository repository;
     //지금 구현체가 없엇지만 boot에서 만든듯
 
+    @Autowired
+    private BoardService boardService;
+
+
+    @Test
+    public void testList() {
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .type("tcw")
+                .keyword("1")
+                .page(1)
+                .size(10)
+                .build();
+
+        PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
+
+        log.info(responseDTO);
+
+    }
+
 
     @Test
     public void testSearchAll(){
@@ -36,8 +60,6 @@ public class BoardRepositoryTests {
         log.info(result);
 
     }
-
-
 
 
     @Test
