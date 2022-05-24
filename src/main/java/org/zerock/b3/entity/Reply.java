@@ -5,9 +5,10 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "t_reply")
+@Table(name = "t_reply",
+        indexes = {@Index(name = "idx_reply_board_bno", columnList = "board_bno")})
 @Getter
-@ToString
+@ToString(exclude = "board")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,7 +22,7 @@ public class Reply extends BaseEntity{
 
     private String replyer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
 
