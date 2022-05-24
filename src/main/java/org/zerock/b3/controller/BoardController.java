@@ -24,7 +24,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping("/list")
-    public void list(PageRequestDTO pageRequestDTO, Model model){
+    public void list(PageRequestDTO pageRequestDTO, Model model) {
         PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
 
         log.info(responseDTO);
@@ -33,22 +33,37 @@ public class BoardController {
     }
 
     @GetMapping("/register")
-    public void registerGET(){}
+    public void registerGET() {
+    }
 
     @PostMapping("/register")
-    public String registerPOST(@Valid BoardDTO boardDTO, BindingResult bindingResult,RedirectAttributes rttr){
+    public String registerPOST(@Valid BoardDTO boardDTO, BindingResult bindingResult, RedirectAttributes rttr) {
 
-        log.info("board register"+boardDTO);
-        if (bindingResult.hasErrors()){
+        log.info("board register" + boardDTO);
+        if (bindingResult.hasErrors()) {
             log.info("has errors.....");
-            rttr.addFlashAttribute("errors",bindingResult.getAllErrors());
+            rttr.addFlashAttribute("errors", bindingResult.getAllErrors());
             return "redirect:/board/register";
         }
 
         Integer bno = boardService.register(boardDTO);
-        rttr.addFlashAttribute("result",bno);
+        rttr.addFlashAttribute("result", bno);
 
         return "redirect:/board/list";
+    }
+
+    @GetMapping("/read")
+    public void read(Integer bno, PageRequestDTO pageRequestDTO, Model model) {
+
+        log.info("read" + bno);
+        log.info("read" + pageRequestDTO);
+
+        BoardDTO boardDTO = boardService.readOne(bno);
+
+        log.info("boardDTO" + boardDTO);
+
+        model.addAttribute("dto", boardDTO);
+
     }
 
 }
