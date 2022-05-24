@@ -1,10 +1,8 @@
 package org.zerock.b3.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,10 +13,13 @@ public class ReplyDTO {
 
     private Long rno;
 
+    @NonNull
     private Integer bno;
 
+    @NotEmpty
     private String replyText;
 
+    @NotEmpty
     private String replyer;
 
     private LocalDateTime regDate, modDate;
