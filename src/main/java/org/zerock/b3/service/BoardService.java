@@ -2,6 +2,7 @@ package org.zerock.b3.service;
 
 import org.modelmapper.ModelMapper;
 import org.zerock.b3.dto.BoardDTO;
+import org.zerock.b3.dto.BoardListReplyCountDTO;
 import org.zerock.b3.dto.PageRequestDTO;
 import org.zerock.b3.dto.PageResponseDTO;
 
@@ -15,6 +16,6 @@ public interface BoardService {
 
     void remove(Integer bno);
 
-    PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO);
+    PageResponseDTO<BoardListReplyCountDTO> list(PageRequestDTO pageRequestDTO);
 
 }

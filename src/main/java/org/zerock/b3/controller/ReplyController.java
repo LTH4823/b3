@@ -1,16 +1,17 @@
 package org.zerock.b3.controller;
 
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.zerock.b3.dto.PageRequestDTO;
+import org.zerock.b3.dto.PageResponseDTO;
 import org.zerock.b3.dto.ReplyDTO;
+import org.zerock.b3.service.ReplyService;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -18,21 +19,37 @@ import java.util.Map;
 @RestController
 @RequestMapping("/replies")
 @Log4j2
+@RequiredArgsConstructor
 public class ReplyController {
+
+    private final ReplyService replyService;
 
     @ApiOperation(value = "Replies POST", notes = "POST 방식으로 댓글 등록")
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Long>> register(
+    public Map<String, Long> register(
             @Valid @RequestBody ReplyDTO replyDTO, BindingResult bindingResult) throws BindException {
 
         log.info(replyDTO);
 
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
 
-        Map<String, Long> resultMap = Map.of("rno", 111L);
+        Long rno = replyService.register(replyDTO);
 
-        return ResponseEntity.ok(resultMap);
+        Map<String, Long> resultMap = Map.of("rno", rno);
+
+        return Map.of("rno", rno);
+
+    }
+
+    @ApiOperation(value = "Replies of Board", notes = "GET 방식으로 특정 게시물의 댓글 목록")
+    @GetMapping(value = "/list/{bno}")
+    public PageResponseDTO<ReplyDTO> getList(@PathVariable("bno") Integer bno,
+                                             PageRequestDTO pageRequestDTO){
+
+        PageResponseDTO<ReplyDTO> responseDTO = replyService.getListOfBoard(bno, pageRequestDTO);
+
+        return responseDTO;
     }
 }

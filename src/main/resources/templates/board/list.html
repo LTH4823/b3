@@ -55,7 +55,8 @@
                         <tr th:each="dto:${responseDTO.dtoList}">
                             <th scope="row">[[${dto.bno}]]</th>
                             <td>
-                                <a th:href="|@{/board/read(bno =${dto.bno})}&${link}|"> [[${dto.title}]] </a>
+                                <a th:href="|@{/board/read(bno =${dto.bno})}&${link}|"> [[${dto.title}]]
+                                    <b>[ [[${dto.replyCount}]] ]</b></a>
                             </td>
                             <td>[[${dto.writer}]]</td>
                             <td>[[${#temporals.format(dto.regDate, 'yyyy-MM-dd')}]

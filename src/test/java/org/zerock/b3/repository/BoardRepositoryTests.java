@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.zerock.b3.dto.BoardDTO;
+import org.zerock.b3.dto.BoardListReplyCountDTO;
 import org.zerock.b3.dto.PageRequestDTO;
 import org.zerock.b3.dto.PageResponseDTO;
 import org.zerock.b3.entity.Board;
@@ -40,10 +41,10 @@ public class BoardRepositoryTests {
                 .page(1)
                 .size(10)
                 .build();
+//
+//        PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
 
-        PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
-
-        log.info(responseDTO);
+//        log.info(responseDTO);
 
     }
 
@@ -176,5 +177,14 @@ public class BoardRepositoryTests {
         //만약  가져올게 많으면 이름도 엄청 길어지겟지 [쓸일없다 ㅋ]
         log.info(list);
 
+    }
+
+    @Test
+    public void testWithReplyCount(){
+
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+
+        Page<BoardListReplyCountDTO> result =
+                repository.searchWithReplyCount(null,null,pageable);
     }
 }
