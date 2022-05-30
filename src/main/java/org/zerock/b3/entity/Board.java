@@ -6,6 +6,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "t_board")
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
-@ToString
+@ToString(exclude = "boardImages")
 public class Board extends BaseEntity{
 
     @Id
@@ -40,5 +42,17 @@ public class Board extends BaseEntity{
     public void changeContent(String content){
         this.content = content;
     }
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="board")
+    @Builder.Default
+    private Set<BoardImage> boardImages = new HashSet<>();
+
+    public void addImage(BoardImage boardImage) {
+
+        boardImage.fixOrd(boardImages.size());
+        boardImages.add(boardImage);
+    }
+
 
 }

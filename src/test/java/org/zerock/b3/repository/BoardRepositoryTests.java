@@ -1,5 +1,4 @@
 package org.zerock.b3.repository;
-
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,160 +7,185 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.zerock.b3.dto.BoardDTO;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.b3.dto.BoardListReplyCountDTO;
-import org.zerock.b3.dto.PageRequestDTO;
-import org.zerock.b3.dto.PageResponseDTO;
 import org.zerock.b3.entity.Board;
-import org.zerock.b3.service.BoardService;
+import org.zerock.b3.entity.BoardImage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @SpringBootTest
-//스프링과 다르게 일단 이것만 추가하면됨
 @Log4j2
 public class BoardRepositoryTests {
 
     @Autowired
     private BoardRepository repository;
-    //지금 구현체가 없엇지만 boot에서 만든듯
 
-    @Autowired
-    private BoardService boardService;
+
 
 
     @Test
-    public void testList() {
+    public void testEager() {
 
-        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
-                .type("tcw")
-                .keyword("1")
-                .page(1)
-                .size(10)
-                .build();
-//
-//        PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
+        Integer bno = 124;
 
-//        log.info(responseDTO);
+        Optional<Board> result = repository.findById(bno);
+
+        Board board = result.orElseThrow();
+
+        log.info(board);
+
+    }
+
+
+    @Transactional
+    @Test
+    public void testPageImage(){
+
+        Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
+
+        Page<Board> result = repository.findAll(pageable);
+
+        result.getContent().forEach(board -> {
+            log.info(board);
+            log.info(board.getBoardImages());
+            log.info("================");
+        });
+    }
+
+
+    @Test
+    public void testInsertWithImage() {
+
+        for (int i = 0; i < 20; i++) {
+
+            Board board = Board.builder()
+                    .title("fileTest.." +i)
+                    .content("fileTest")
+                    .writer("user" + (i % 10))
+                    .build();
+
+            for (int j = 0; j < 2; j++) {
+                BoardImage boardImage = BoardImage.builder()
+                        .uuid(UUID.randomUUID().toString())
+                        .fileName(i+"aaa.jpg")
+                        .img(true)
+                        .build();
+                board.addImage(boardImage);
+            }//image
+
+            repository.save(board);
+        }
 
     }
 
 
     @Test
-    public void testSearchAll(){
-        String[] types = new String[]{"t","c","w"};
+    public void testSearchAll() {
+
+        String[] types = new String[]{"t","c"};
         String keyword = "5";
 
-        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
-
-        Page<Board>  result = repository.searchAll(types,keyword,pageable);
+        Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
+        Page<Board> result = repository.searchAll(types,keyword, pageable);
 
         log.info(result);
 
     }
 
-
     @Test
-    public void testSearch1(){
+    public void testSearch1() {
 
-        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+        Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
 
         repository.search1(pageable);
+
     }
 
+
     @Test
-    public void testInsert(){
+    public void testInsesrt(){
 
-        log.info("--------------------");
-        log.info("--------------------");
+        log.info("---------------------");
+        log.info("---------------------");
         log.info(repository);
-        log.info("--------------------");
+        log.info("---------------------");
 
-        IntStream.rangeClosed(1, 100).forEach(i->{
-
+        IntStream.rangeClosed(1,100).forEach(i -> {
             Board board = Board.builder()
-                    .title("Title..."+i)
-                    .content("Content..."+i)
-                    .writer("user"+(i%10))
+                    .title("Title... "+i)
+                    .content("Content...."+i)
+                    .writer("user"+ (i %10))
                     .build();
 
             repository.save(board);
         });
 
     }
+
     @Test
     public void testRead(){
+
         Integer bno = 100;
+
         Optional<Board> result = repository.findById(bno);
-        //반환 타입이 신기하네 ,null point Excrption 안나오게 결과를 감싼다네
-        Board board = result.orElseThrow();
-        //만약 값이 null이면 알랴줘
+
+        Board board = result.get();
+
         log.info(board);
     }
 
     @Test
     public void testUpdate(){
-
-//        Board board = Board.builder()
-//                .bno(100)
-//                .title("100 Title")
-//                .writer("user 11")
-//                .build();
-//
-//        repository.save(board);
-
         Integer bno = 100;
+
         Optional<Board> result = repository.findById(bno);
-        //반환 타입이 신기하네 ,null point Excrption 안나오게 결과를 감싼다네
+
         Board board = result.get();
-        board.changeTitle("100Title...updated");
-        board.changeContent("100Contnet..update");
+        board.changeTitle("100title..updated");
+        board.changeContent("100Content...updated");
 
         repository.save(board);
 
         log.info(board);
-        //원본 복사하고
-        // 수정할 내용만 수정하고
-        //insert 처리한데 ,, 일단 조회가 필수고 복사해서 필요한것만
-
-        //또는 iD만 같으면 같게 생각하니까 ~~
-//
     }
 
     @Test
-    public void testDelete(){
-        //없는 번호 삭제 해볻자
+    public void testDelete() {
+
+        //없는 번호 삭제
         Integer bno = 100;
-        repository.deleteById(bno);
-        //DB와의 동기화를 목적이라 일단 조회후 작업한다
-    }
 
+        repository.deleteById(bno);
+
+    }
     @Test
-    public void testPage1(){
-        Pageable pageable = PageRequest.of(1,10, Sort.by("bno").descending());
-//        repository.findAll(pageable);
+    public void testPage1() {
+
+        Pageable pageable = PageRequest.of(0,10, Sort.by("bno").descending());
+
         Page<Board> result = repository.findAll(pageable);
 
-        log.info("Total " +result.getTotalElements());
-        log.info("TotalPages "+result.getTotalPages());
-        log.info("Current: "+ result.getNumber());
-        log.info("Size :" + result.getSize());
+        log.info("TOTAL " +result.getTotalElements());
+        log.info("TOTALPAGES: " + result.getTotalPages());
+        log.info("CURRENT: " + result.getNumber());
+        log.info("SIZE: " + result.getSize());
 
         result.getContent().forEach(board -> log.info(board));
-        //뒤에 데이터 가 더 있다고 생각되면 count쿼리 날림 PageRequest.of(0,10)
-        //안할때도 잇네
-        //Sort.by("bno").descending() << desc 로 정렬
-        //페이지는 0부터 시작한다!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
 
     }
+
     @Test
-    public void testQueryMethod(){
+    public void testQueryMethod1(){
 
         String keyword = "5";
+
         List<Board> list = repository.findByTitleContaining(keyword);
-        //모든 메서드의 끝을 pageable 하고 리턴을 page로 받으면 다 페이지 처리함
+
         log.info(list);
 
     }
@@ -171,20 +195,23 @@ public class BoardRepositoryTests {
 
         String keyword = "5";
 
-        Pageable pageable = PageRequest.of(0,5,Sort.by("bno").descending());
-        Page<Board> list = repository.findByTitleContaining(keyword,pageable);
-        //모든 메서드의 끝을 pageable 하고 리턴을 page로 받으면 다 페이지 처리함
-        //만약  가져올게 많으면 이름도 엄청 길어지겟지 [쓸일없다 ㅋ]
+        Pageable pageable = PageRequest.of(0,5, Sort.by("bno").descending());
+
+        Page<Board> list = repository.findByTitleContaining(keyword, pageable);
+
         log.info(list);
 
     }
 
     @Test
-    public void testWithReplyCount(){
+    public void testWithReplyCount() {
 
         Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
 
-        Page<BoardListReplyCountDTO> result =
-                repository.searchWithReplyCount(null,null,pageable);
+        Page<BoardListReplyCountDTO> result
+
+                = repository.searchWithReplyCount(null,null, pageable);
+
     }
+
 }

@@ -2,7 +2,9 @@ package org.zerock.b3.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.zerock.b3.entity.Board;
 import org.zerock.b3.repository.search.BoardSearch;
 
@@ -19,4 +21,9 @@ public interface BoardRepository extends JpaRepository<Board, Integer>, BoardSea
 
     Page<Board> findByTitleContaining(String keyword, Pageable pageable);
     //파라메터 끝에 pageable 넣고 return을 Page로 받으면 페이징 처리도 됨
+
+    @EntityGraph(attributePaths = {"boardImages"})
+    @Query("select b from Board b")
+    Page<Board> getList1(Pageable pageable);
+
 }
