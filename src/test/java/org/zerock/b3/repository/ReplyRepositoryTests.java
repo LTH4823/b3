@@ -22,6 +22,26 @@ public class ReplyRepositoryTests {
     ReplyRepository replyRepository;
 
     @Test
+    public void testInsert2() {
+        for (int i = 1; i <= 20; i++) {
+            Board board = Board.builder().bno(i).build();
+
+            int count = i%5;
+
+            for (int j = 0; j < count; j++) {
+                Reply reply = Reply.builder()
+                        .board(board)
+                        .replyText(i+"--"+j+"댓글")
+                        .replyer("user00")
+                        .build();
+                replyRepository.save(reply);
+            }//end for j
+        }//end for
+    }
+
+
+
+    @Test
     public void testInsert() {
 
         Board board = Board.builder().bno(100).build();

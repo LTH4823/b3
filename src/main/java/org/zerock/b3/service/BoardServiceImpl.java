@@ -7,17 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zerock.b3.dto.BoardDTO;
-import org.zerock.b3.dto.BoardListReplyCountDTO;
-import org.zerock.b3.dto.PageRequestDTO;
-import org.zerock.b3.dto.PageResponseDTO;
+import org.zerock.b3.dto.*;
 import org.zerock.b3.entity.Board;
 import org.zerock.b3.repository.BoardRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -31,12 +27,16 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public Integer register(BoardDTO boardDTO) {
 
-        Board board = modelMapper.map(boardDTO, Board.class);
-        log.info("register........"+board);
+        //
+        Board board = dtoToEntity(boardDTO);
 
-        Board result = boardRepository.save(board);
+        log.info("----------------------------");
+        log.info(board);
+        log.info(board.getBoardImages());
+        Integer bno = boardRepository.save(board).getBno();
 
-        return result.getBno();
+        return bno;
+
     }
 
     @Override
@@ -65,22 +65,20 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public void remove(Integer bno) {
+
         boardRepository.deleteById(bno);
     }
 
     @Override
-    public PageResponseDTO<BoardListReplyCountDTO> list(PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<BoardListWithImageDTO> list(PageRequestDTO pageRequestDTO) {
         String[] types = pageRequestDTO.getTypes();
         String keyword = pageRequestDTO.getKeyword();
         Pageable pageable = pageRequestDTO.getPageable("bno");
 
-        Page<BoardListReplyCountDTO> result = boardRepository.searchWithReplyCount(types, keyword, pageable);
+        Page<BoardListWithImageDTO> result =
+                boardRepository.searchWithImage(types, keyword, pageable);
 
-//        List<BoardDTO> dtoList = result.getContent().stream()
-//                .map(board -> modelMapper.map(board,BoardDTO.class)).collect(Collectors.toList());
-
-
-        return PageResponseDTO.<BoardListReplyCountDTO>withAll()
+        return PageResponseDTO.<BoardListWithImageDTO>withAll()
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(result.toList())
                 .total((int)result.getTotalElements())

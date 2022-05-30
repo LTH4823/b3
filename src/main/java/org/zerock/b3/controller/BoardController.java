@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.zerock.b3.dto.BoardDTO;
-import org.zerock.b3.dto.BoardListReplyCountDTO;
-import org.zerock.b3.dto.PageRequestDTO;
-import org.zerock.b3.dto.PageResponseDTO;
+import org.zerock.b3.dto.*;
 import org.zerock.b3.service.BoardService;
 
 import javax.validation.Valid;
@@ -22,49 +19,58 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/board")
 public class BoardController {
+
     private final BoardService boardService;
 
     @GetMapping("/list")
-    public void list(PageRequestDTO pageRequestDTO, Model model) {
-        PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.list(pageRequestDTO);
+    public void list(PageRequestDTO pageRequestDTO, Model model){
+
+        PageResponseDTO<BoardListWithImageDTO> responseDTO = boardService.list(pageRequestDTO);
 
         log.info(responseDTO);
 
         model.addAttribute("responseDTO", responseDTO);
+
     }
 
     @GetMapping("/register")
-    public void registerGET() {
+    public void registerGET(){
+
     }
 
     @PostMapping("/register")
-    public String registerPOST(@Valid BoardDTO boardDTO, BindingResult bindingResult, RedirectAttributes rttr) {
+    public String registerPost(@Valid BoardDTO boardDTO,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes){
 
-        log.info("board register" + boardDTO);
-        if (bindingResult.hasErrors()) {
-            log.info("has errors.....");
-            rttr.addFlashAttribute("errors", bindingResult.getAllErrors());
+        log.info("board register:" + boardDTO);
+
+        if(bindingResult.hasErrors()){
+            log.info("has errors.......");
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors() );
             return "redirect:/board/register";
         }
 
         Integer bno = boardService.register(boardDTO);
-        rttr.addFlashAttribute("result", bno);
+
+        redirectAttributes.addFlashAttribute("result", bno);
 
         return "redirect:/board/list";
     }
 
     @GetMapping("/read")
-    public void read(Integer bno, PageRequestDTO pageRequestDTO, Model model) {
+    public void read(Integer bno, PageRequestDTO pageRequestDTO, Model model){
 
-        log.info("read" + bno);
-        log.info("read" + pageRequestDTO);
+        log.info("read  " + bno);
+        log.info("read " + pageRequestDTO);
 
         BoardDTO boardDTO = boardService.readOne(bno);
 
-        log.info("boardDTO" + boardDTO);
+        log.info("boardDTO: " + boardDTO);
 
         model.addAttribute("dto", boardDTO);
-
     }
+
+
 
 }

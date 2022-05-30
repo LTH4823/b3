@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerock.b3.dto.BoardListReplyCountDTO;
 import org.zerock.b3.entity.Board;
@@ -24,7 +25,37 @@ public class BoardRepositoryTests {
     @Autowired
     private BoardRepository repository;
 
+    @Transactional
+    @Test
+    public void testWithImage(){
 
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+
+        repository.searchWithImage(null,null,pageable);
+
+    }
+
+    @Transactional
+    @Commit
+    @Test
+    public void testUpdateImage(){
+
+        Board board = repository.getById(20);
+
+        board.changeTitle("제목 수정.... 20");
+
+        board.clearImages();
+
+        for (int i = 0; i < 3; i++) {
+
+            BoardImage boardImage = BoardImage.builder()
+                    .fileLink("aaa"+i+"jpg")
+                    .build();
+            board.addImage(boardImage);
+        }
+
+        repository.save(board);
+    }
 
 
     @Test
@@ -70,9 +101,7 @@ public class BoardRepositoryTests {
 
             for (int j = 0; j < 2; j++) {
                 BoardImage boardImage = BoardImage.builder()
-                        .uuid(UUID.randomUUID().toString())
-                        .fileName(i+"aaa.jpg")
-                        .img(true)
+                        .fileLink(i+"aaa.jpg")
                         .build();
                 board.addImage(boardImage);
             }//image

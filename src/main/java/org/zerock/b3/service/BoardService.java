@@ -1,10 +1,10 @@
 package org.zerock.b3.service;
 
 import org.modelmapper.ModelMapper;
-import org.zerock.b3.dto.BoardDTO;
-import org.zerock.b3.dto.BoardListReplyCountDTO;
-import org.zerock.b3.dto.PageRequestDTO;
-import org.zerock.b3.dto.PageResponseDTO;
+import org.zerock.b3.dto.*;
+import org.zerock.b3.entity.Board;
+
+import java.util.stream.Collectors;
 
 public interface BoardService {
 
@@ -16,6 +16,42 @@ public interface BoardService {
 
     void remove(Integer bno);
 
-    PageResponseDTO<BoardListReplyCountDTO> list(PageRequestDTO pageRequestDTO);
+    PageResponseDTO<BoardListWithImageDTO> list(PageRequestDTO pageRequestDTO);
 
+    default Board dtoToEntity(BoardDTO boardDTO){
+
+        Board board = Board.builder()
+                .bno(boardDTO.getBno())
+                .title(boardDTO.getTitle())
+                .content(boardDTO.getContent())
+                .writer(boardDTO.getWriter())
+
+                .build();
+
+        if(boardDTO.getFileList() != null && boardDTO.getFileList().size() > 0) {
+            boardDTO.getFileList().forEach(imgLink -> board.addImage(imgLink));
+        }
+
+        return board;
+    }
+
+    default BoardDTO entityToDto(Board board) {
+
+        BoardDTO dto = BoardDTO.builder()
+                .bno(board.getBno())
+                .title((board.getTitle()))
+                .content(board.getContent())
+                .writer(board.getWriter())
+                .regDate(board.getRegDate())
+                .modDate(board.getModDate())
+                .build();
+
+        if(board.getBoardImages() != null && board.getBoardImages().size() > 0) {
+            dto.setFileList(
+                    board.getBoardImages().stream().map(boardImage -> boardImage.getFileLink())
+                            .collect(Collectors.toList()));
+        }
+
+        return dto;
+    }
 }
